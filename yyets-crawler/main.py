@@ -1,15 +1,22 @@
 import requests
 
+from encry import AESCipher
+
 
 def get_api_result(_id):
     """get json from api"""
     url = f"https://yyets.dmesg.app/api/resource?id={_id}"
+    c = AESCipher("40595")
+    en_str = c.encrypt(f"/api/resource?id={_id}")
+
     headers = {
+        "ne1": en_str.decode('utf-8'),
         "referer": f"https://yyets.dmesg.app/resource.html?id={_id}",
         "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36"
     }
+
     resp = requests.get(url, timeout=10, headers=headers).json()
-    # print(resp)
+    print(resp)
     if not resp['info'] == 'OK':
         print("some error!")
         return

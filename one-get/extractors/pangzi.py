@@ -10,6 +10,7 @@ import m3u8
 import requests
 import urllib3
 from util.hex_tool import parser_hex
+from util.http_util import retry
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -111,6 +112,7 @@ class PangziExtractor:
         download_urls = [os.path.join(pre_url, seg.uri) for seg in segs]
         return download_urls
 
+    @retry(max=3)
     def download_ts(self, url, label):
         _fn = url.split('/')[-1]
         _path = os.path.join(self.out_path, label)

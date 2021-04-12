@@ -13,7 +13,7 @@ from process.merge_ts import ts2mp4
 # url = input('请输入下载地址：')
 # proxy = input('请输入socks代理：') # 127.0.0.1:1080
 # output_path = input('请输入下载路径：')
-url = "https://www.pangzitv.com/vod-play-id-22944-src-1-num-952.html"
+url = "https://www.pangzitv.com/vod-play-id-66081-src-1-num-1.html"
 proxy = "127.0.0.1:1080"
 output_path = "/home/dean/Downloads/batch_dl"
 

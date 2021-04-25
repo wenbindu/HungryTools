@@ -27,17 +27,18 @@ class PangziExtractor:
         self.init_url = init_url
         self.proxy = proxy
         self.out_path = out_path
+        self.header = {
+            "Referer": "https://www.pangzitv.com/",
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
+        }
+        self.ts_header = {
+            "Accept-Encoding": "gzip, deflate, br",
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36',
+            "Origin": "https://www.pangzitv.com",
+            "Referer": "https://www.pangzitv.com"
+        }
 
-    @property
-    def req(self):
-        """add header and proxy
-
-        Returns:
-            request-session: request session instance
-        """
-        s = requests.Session()
-        s.headers.update({'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36'})
-
+    def update_proxy(self):
         if 'http' in self.proxy:
             proxies = {
                 'http': f'http://{self.proxy.get("http")}',
@@ -52,9 +53,37 @@ class PangziExtractor:
         else:
             assert 'error'
         
-        s.proxies.update(proxies)
+        return proxies
+
+
+    @property
+    def req(self):
+        """add header and proxy
+
+        Returns:
+            request-session: request session instance
+        """
+        s = requests.Session()
+        s.headers.update(self.header)
+
+        
+        s.proxies.update(self.update_proxy())
         return s 
 
+    @property
+    def req_ts(self):
+        """add header and proxy
+
+        Returns:
+            request-session: request session instance
+        """
+        s = requests.Session()
+        s.headers.update(self.ts_header)
+
+        s.proxies.update(self.update_proxy())
+        return s 
+
+    @retry(max=5)
     def get_m3u8(self):
         resp_js = None
 
@@ -91,6 +120,7 @@ class PangziExtractor:
         _label = parser_hex(_label)
         return _label, _m3u8
 
+    @retry(max=3)
     def get_playlist(self, mu_url, label):
         _fn = mu_url.split('/')[-1]
         _path = os.path.join(self.out_path, label)
@@ -121,6 +151,6 @@ class PangziExtractor:
         if os.path.exists(_fp):
             return
 
-        resp = self.req.get(url, stream=True, verify=False)
+        resp = self.req_ts.get(url, stream=True, verify=False)
         with open(_fp, 'wb') as f:
             f.write(resp.content)

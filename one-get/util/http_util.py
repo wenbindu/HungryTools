@@ -2,7 +2,7 @@ import functools
 import time
 
 
-def retry(max=3, time_sleep=1):
+def retry(max=3, time_sleep=2):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
